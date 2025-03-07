@@ -1,0 +1,212 @@
+@import "_null.scss";
+
+@font-face {
+  font-family: "Al Bizantheum";
+  src: url("../fonts/Al_Bizantheum.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Bizantheum";
+  src: url("../fonts/Bizantheum.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: "England";
+  src: url("../fonts/England.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sweet Sans Pro";
+  src: url("../fonts/SweetSansProRegular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "The Acres Sans";
+  src: url("../fonts/TheAcresSans.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+}
+body {
+  background-color: #f1ece3;
+}
+.container {
+  max-width: 1129px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+//  HEADER START
+header {
+  &.site-header {
+    height: 70px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    .container {
+      margin-left: 0;
+    }
+    img {
+      width: 213px;
+      height: auto;
+    }
+  }
+}
+//  HEADER END
+
+// POSTS START
+.posts--nav {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: 4%;
+  position: relative;
+  padding: 0 0 25px 0;
+  @media screen and (max-width: 767px) {
+    max-width: 100%;
+    overflow-x: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+
+  &::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: #d5caca;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+
+  a {
+    font-family: "The Acres Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 11px;
+    line-height: 20px;
+    text-transform: capitalize;
+    color: #000000;
+  }
+}
+.posts {
+  padding: 100px 0;
+
+  .posts--wrapper {
+    padding: 100px 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 2.79%;
+    .post {
+      background-color: #faf7f2;
+      box-sizing: border-box;
+      border: 1px solid #d7c6b6;
+      width: 31.47%;
+      padding: 17px 17px 35px;
+
+      @media screen and (max-width: 767px) {
+        width: 100%;
+      }
+
+      .post--img {
+        max-width: 100%;
+        margin: auto auto;
+        .img-link {
+          position: relative;
+          display: block;
+          span {
+            font-family: "The Acres Sans";
+            font-weight: 400;
+            font-size: 9px;
+            line-height: 20px;
+            text-transform: capitalize;
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+            border-bottom: 1px solid #eedfd6;
+            color: #000000;
+            background-color: #faf7f2;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+          }
+        }
+        img {
+          width: 100%;
+          aspect-ratio: 309 / 333;
+          object-fit: cover;
+          object-position: center;
+        }
+      }
+      .post--cont {
+        width: 100%;
+        margin: auto auto;
+        .post--category {
+          a {
+            font-family: "Sweet Sans Pro";
+            font-weight: 400;
+            font-size: 12px;
+            line-height: 100%;
+            letter-spacing: 0;
+            text-transform: capitalize;
+            color: #000000;
+            padding-top: 35px;
+            display: block;
+          }
+        }
+        .post--title {
+          font-family: "The Acres Sans";
+          font-weight: 400;
+          font-size: 11px;
+          line-height: 20px;
+          letter-spacing: 0;
+          text-transform: capitalize;
+          color: #000;
+        }
+      }
+      &:hover {
+        .img-link {
+          span {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+  }
+  .more-link {
+    a {
+      display: block;
+      width: max-content;
+      font-family: "The Acres Sans";
+      font-weight: 400;
+      font-size: 10px;
+      line-height: 20px;
+      letter-spacing: 0;
+      text-align: center;
+      text-transform: capitalize;
+      color: #8b9075;
+      padding-bottom: 3px;
+      border-bottom: 2px solid #8b9075;
+      margin: 0 auto;
+    }
+  }
+}
+// POSTS END
