@@ -9,6 +9,7 @@ function filter_posts() {
 
     $category_id = isset($_POST['category']) && $_POST['category'] !== 'all' ? (int) $_POST['category'] : null;
     $pg = isset($_POST['pg']) ? (int) $_POST['pg'] : 1;
+    $posts_per_page = isset($_POST['posts_per_page']) ? (int) $_POST['posts_per_page'] : 9;
 
 
     if ($pg <= 0) {
@@ -16,7 +17,6 @@ function filter_posts() {
     }
 
 
-    $posts_per_page = $pg * 9;
     error_log('Posts per page: ' . $posts_per_page);
 
     $args = array(
@@ -25,6 +25,9 @@ function filter_posts() {
         'orderby'        => 'date',
         'order'          => 'DESC',
     );
+    if($posts_per_page < 10) {
+        $args['paged'] =  $pg;
+    }
 
 
     if ($category_id) {

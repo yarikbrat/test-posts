@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("action", "filter_posts");
     formData.append("category", categoryID);
     formData.append("pg", pg);
+    formData.append("posts_per_page", pg * 9);
     formData.append("nonce", ajax_params.nonce);
 
     fetch(ajax_params.ajax_url, {
@@ -65,6 +66,38 @@ document.addEventListener("DOMContentLoaded", function () {
         postsWrapper.textContent = "Произошла ошибка при загрузке.";
       });
   }
+  function loadAddPosts(clear = false) {
+    if (!postsWrapper) return;
+    console.log("work");
+    const formData = new FormData();
+    formData.append("action", "filter_posts");
+    formData.append("category", categoryID);
+    formData.append("posts_per_page", 9);
+    formData.append("pg", pg);
+    formData.append("nonce", ajax_params.nonce);
+
+    fetch(ajax_params.ajax_url, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Ошибка сети или сервера");
+        return response.json();
+      })
+      .then((data) => {
+        if (!data.success) throw new Error("Ошибка загрузки данных");
+
+        postsWrapper.innerHTML += data.data.html;
+
+        loadMoreLink.style.display = data.data.has_more ? "block" : "none";
+
+        updateUrl();
+      })
+      .catch((error) => {
+        console.error("Ошибка загрузки:", error);
+        postsWrapper.textContent = "Произошла ошибка при загрузке.";
+      });
+  }
 
   navLinks.forEach((link) => {
     link.addEventListener("click", function (e) {
@@ -79,7 +112,8 @@ document.addEventListener("DOMContentLoaded", function () {
     loadMoreBtn.addEventListener("click", function (e) {
       e.preventDefault();
       pg++;
-      loadPosts();
+      loadAddPosts();
+      console.log("html2");
     });
   }
 
