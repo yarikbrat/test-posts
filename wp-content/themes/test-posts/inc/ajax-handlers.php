@@ -1,20 +1,31 @@
+
 <?php
 function filter_posts() {
+
     if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'my_nonce_action' ) ) {
         wp_send_json_error(['message' => 'Ошибка безопасности']);
     }
 
-    $category_id = isset($_POST['category']) && $_POST['category'] !== 'all' ? (int) $_POST['category'] : '';
-    $paged = isset($_POST['page']) ? (int) $_POST['page'] : 1;
-    $posts_per_page = 9;
+
+    $category_id = isset($_POST['category']) && $_POST['category'] !== 'all' ? (int) $_POST['category'] : null;
+    $pg = isset($_POST['pg']) ? (int) $_POST['pg'] : 1;
+
+
+    if ($pg <= 0) {
+        wp_send_json_error(['message' => 'Неверное значение страницы']);
+    }
+
+
+    $posts_per_page = $pg * 9;
+    error_log('Posts per page: ' . $posts_per_page);
 
     $args = array(
         'post_type'      => 'post',
         'posts_per_page' => $posts_per_page,
         'orderby'        => 'date',
         'order'          => 'DESC',
-        'paged'          => $paged,
     );
+
 
     if ($category_id) {
         $args['tax_query'] = array(
@@ -26,9 +37,14 @@ function filter_posts() {
         );
     }
 
+
     $query = new WP_Query($args);
+
+
+    error_log('Found posts: ' . $query->found_posts);
+
     $total_posts = $query->found_posts;
-    $max_pages = ceil($total_posts / $posts_per_page);
+    $max_pages = ceil($total_posts / 9);
 
     ob_start();
 
@@ -69,10 +85,15 @@ function filter_posts() {
     $posts_html = ob_get_clean();
 
 
+    error_log('Returned posts HTML: ' . $posts_html);
+
+
     wp_send_json_success([
         'html' => $posts_html,
-        'has_more' => $paged < $max_pages
+        'has_more' => $pg < $max_pages,
+        'max_pages' => $max_pages,
     ]);
 }
+
 add_action('wp_ajax_filter_posts', 'filter_posts');
 add_action('wp_ajax_nopriv_filter_posts', 'filter_posts');

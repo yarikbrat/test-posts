@@ -3,53 +3,43 @@ document.addEventListener("DOMContentLoaded", function () {
   const postsWrapper = document.querySelector(".posts--wrapper");
   const loadMoreLink = document.querySelector(".more-link");
   const loadMoreBtn = loadMoreLink ? loadMoreLink.querySelector("a") : null;
-  let page = 1;
-  let categoryID = "";
 
-  function getCategoryFromUrl() {
+  function getParamsFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get("category") ? urlParams.get("category") : "all";
+    const category = urlParams.get("category") || "all";
+    const pageParam = urlParams.get("pg");
+    const pg = pageParam && !isNaN(pageParam) ? parseInt(pageParam, 10) : 1;
+    return { category, pg };
   }
 
-  categoryID = getCategoryFromUrl();
+  let { category: categoryID, pg } = getParamsFromUrl();
 
-  navLinks.forEach((link) => {
-    link.addEventListener("click", function (e) {
-      e.preventDefault();
+  function updateUrl() {
+    const params = new URLSearchParams(window.location.search);
+    params.set("category", categoryID);
 
-      categoryID = this.getAttribute("data-category");
+    if (pg > 1) {
+      params.set("pg", pg);
+    } else {
+      params.delete("pg");
+    }
 
-      let newUrl = window.location.href.split("?")[0];
-      if (categoryID && categoryID !== "all") {
-        newUrl = `${newUrl}?category=${categoryID}`;
-      }
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
 
-      history.pushState({ path: newUrl }, "", newUrl);
-
-      page = 1;
-      loadPosts();
-    });
-  });
-
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      page++;
-      loadPosts();
-    });
+    history.pushState(null, "", newUrl);
   }
 
-  function loadPosts() {
+  function loadPosts(clear = false) {
     if (!postsWrapper) return;
 
-    if (page === 1) {
-      postsWrapper.innerHTML = "<p>Загрузка...</p>";
+    if (clear) {
+      postsWrapper.textContent = "Загрузка...";
     }
 
     const formData = new FormData();
     formData.append("action", "filter_posts");
     formData.append("category", categoryID);
-    formData.append("page", page);
+    formData.append("pg", pg);
     formData.append("nonce", ajax_params.nonce);
 
     fetch(ajax_params.ajax_url, {
@@ -57,39 +47,51 @@ document.addEventListener("DOMContentLoaded", function () {
       body: formData,
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Ошибка сети или сервера");
-        }
+        if (!response.ok) throw new Error("Ошибка сети или сервера");
         return response.json();
       })
       .then((data) => {
-        if (!data.success) {
-          throw new Error("Ошибка загрузки данных");
-        }
+        if (!data.success) throw new Error("Ошибка загрузки данных");
 
-        if (page === 1) {
-          postsWrapper.innerHTML = data.data.html;
-        } else {
-          postsWrapper.innerHTML += data.data.html;
-        }
+        postsWrapper.textContent = "";
+        postsWrapper.innerHTML = data.data.html;
 
-        if (!data.data.has_more) {
-          loadMoreLink.style.display = "none";
-        } else {
-          loadMoreLink.style.display = "block";
-        }
+        loadMoreLink.style.display = data.data.has_more ? "block" : "none";
+
+        updateUrl();
       })
       .catch((error) => {
         console.error("Ошибка загрузки:", error);
-        postsWrapper.innerHTML = "<p>Произошла ошибка при загрузке.</p>";
+        postsWrapper.textContent = "Произошла ошибка при загрузке.";
       });
   }
 
-  window.addEventListener("popstate", function () {
-    categoryID = getCategoryFromUrl();
-    page = 1;
-    loadPosts();
+  navLinks.forEach((link) => {
+    link.addEventListener("click", function (e) {
+      e.preventDefault();
+      categoryID = this.getAttribute("data-category");
+      pg = 1;
+      loadPosts(true);
+    });
   });
 
-  loadPosts();
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      pg++;
+      loadPosts();
+    });
+  }
+
+  window.addEventListener("popstate", function (event) {
+    if (event.state) {
+      categoryID = event.state.category;
+      pg = event.state.pg;
+    } else {
+      ({ category: categoryID, pg } = getParamsFromUrl());
+    }
+    loadPosts(true);
+  });
+
+  loadPosts(true);
 });
