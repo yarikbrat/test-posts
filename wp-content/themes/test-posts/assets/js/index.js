@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const newUrl = `${window.location.pathname}?${params.toString()}`;
 
-    history.pushState(null, "", newUrl);
+    history.replaceState(null, "", newUrl);
   }
 
   function loadPosts(clear = false) {
