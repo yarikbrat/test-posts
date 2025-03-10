@@ -133,7 +133,7 @@ header.site-header {
   justify-content: flex-start;
 }
 header.site-header .container {
-  margin-left: 0;
+  width: 1129px;
 }
 header.site-header img {
   width: 213px;
