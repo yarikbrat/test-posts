@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let { category: categoryID, pg } = getParamsFromUrl();
 
-  function updateUrl() {
+  function updateUrl(isNewState = false) {
     const params = new URLSearchParams(window.location.search);
     params.set("category", categoryID);
 
@@ -26,10 +26,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const newUrl = `${window.location.pathname}?${params.toString()}`;
 
-    history.replaceState(null, "", newUrl);
+    if (isNewState) {
+      history.pushState({ category: categoryID, pg: pg }, "", newUrl);
+      console.log("push");
+    } else {
+      history.replaceState({ category: categoryID, pg: pg }, "", newUrl);
+      console.log("replace");
+    }
   }
 
-  function loadPosts(clear = false) {
+  function loadPosts(clear = false, state) {
     if (!postsWrapper) return;
 
     if (clear) {
@@ -59,14 +65,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
         loadMoreLink.style.display = data.data.has_more ? "block" : "none";
 
-        updateUrl();
+        updateUrl(state);
       })
       .catch((error) => {
         console.error("Ошибка загрузки:", error);
         postsWrapper.textContent = "Произошла ошибка при загрузке.";
       });
   }
-  function loadAddPosts(clear = false) {
+  function loadAddPosts(clear = false, state) {
     if (!postsWrapper) return;
     // console.log("work");
     const formData = new FormData();
@@ -91,7 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         loadMoreLink.style.display = data.data.has_more ? "block" : "none";
 
-        updateUrl();
+        updateUrl(state);
       })
       .catch((error) => {
         console.error("Ошибка загрузки:", error);
@@ -104,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       e.preventDefault();
       categoryID = this.getAttribute("data-category");
       pg = 1;
-      loadPosts(true);
+      loadPosts(true, true);
     });
   });
 
@@ -112,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
     loadMoreBtn.addEventListener("click", function (e) {
       e.preventDefault();
       pg++;
-      loadAddPosts();
+      loadAddPosts(false, true);
       // console.log("html2");
     });
   }
@@ -124,7 +130,8 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       ({ category: categoryID, pg } = getParamsFromUrl());
     }
-    loadPosts(true);
+    loadPosts(true, false);
+    console.log("hi");
   });
 
   loadPosts(true);
