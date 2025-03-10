@@ -52,6 +52,8 @@ function filter_posts() {
     ob_start();
 
     if ($query->have_posts()) :
+        $post_count = 0;
+
         while ($query->have_posts()) : $query->the_post();
             $post_id = get_the_ID();
             $post_title = get_the_title();
@@ -61,12 +63,14 @@ function filter_posts() {
             $categories = get_the_category();
             $category_link = !empty($categories) ? get_category_link($categories[0]->term_id) : '#';
             $category_name = !empty($categories) ? esc_html($categories[0]->name) : 'Без категории';
+
+            $loading_attr = $post_count === 0 ? 'eager' : 'lazy';
             ?>
 
             <div class="post">
                 <div class="post--img">
                     <a class="img-link" href="<?php echo esc_url($post_link); ?>">
-                        <img src="<?php echo esc_url($post_thumbnail); ?>" alt="<?php echo esc_attr($post_title); ?>">
+                        <img src="<?php echo esc_url($post_thumbnail); ?>" alt="<?php echo esc_attr($post_title); ?>" loading="<?php echo esc_attr($loading_attr); ?>">
                         <span>Read more</span>
                     </a>
                 </div>
@@ -81,6 +85,7 @@ function filter_posts() {
             </div>
 
             <?php
+            $post_count++;
         endwhile;
         wp_reset_postdata();
     endif;

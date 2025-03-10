@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   function loadAddPosts(clear = false) {
     if (!postsWrapper) return;
-    console.log("work");
+    // console.log("work");
     const formData = new FormData();
     formData.append("action", "filter_posts");
     formData.append("category", categoryID);
@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
       e.preventDefault();
       pg++;
       loadAddPosts();
-      console.log("html2");
+      // console.log("html2");
     });
   }
 
